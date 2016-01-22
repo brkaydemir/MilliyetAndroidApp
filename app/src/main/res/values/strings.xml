@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">MilliyetAppAndroid</string>
+    <string name="action_settings">Settings</string>
+    <string name="left"><![CDATA[<]]></string>
+    <string name="right"><![CDATA[>]]></string>
+
+    <string-array name="burclar">
+        <item>Oglak</item>
+        <item>Balik</item>
+        <item>Kova</item>
+        <item>Koc</item>
+        <item>Yay</item>
+        <item>Akrep</item>
+        <item>Terazi</item>
+        <item>Basak</item>
+        <item>Aslan</item>
+        <item>Yengec</item>
+        <item>ikizler</item>
+        <item>Boga</item>
+    </string-array>
+
+</resources>

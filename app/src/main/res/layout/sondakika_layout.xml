@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text=" Son Dakika! "
+        android:textAlignment="center"
+        android:gravity="center"
+        android:background="#ffff0f0f"
+        android:textSize="20dp"
+        android:id="@+id/sonDakikaText"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:text=""
+        android:textSize="10dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/button3"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/sonDakikaText"
+        android:layout_toEndOf="@+id/sonDakikaText" />
+
+</RelativeLayout>
