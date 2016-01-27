@@ -52,7 +52,7 @@ public class ArPiyasa {
         }
     }
 
-    private class PiyasaItem
+    public class PiyasaItem
     {
         public String piyasa_name;
         public String value;

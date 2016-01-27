@@ -1,20 +1,17 @@
 package com.example.burakaydemir.milliyetappandroid;
 
 import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
-import android.content.Intent;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -23,7 +20,7 @@ import java.io.StringReader;
 import java.util.Observable;
 import java.util.Observer;
 
-public class ArticleActivity extends Activity implements TextWatcher, Observer {
+public class ArticleActivity extends AppCompatActivity implements TextWatcher, Observer {
 
     public final String detay_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=";
 

@@ -8,23 +8,30 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/imageView"
-        android:scaleType="centerCrop"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
         android:layout_alignParentTop="true" />
 
-    <Button
-        android:layout_width="60dp"
-        android:layout_height="fill_parent"
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/left"
         android:background="@android:color/transparent"
-        android:text="@string/left"
+        android:scaleType="fitCenter"
+        android:text=""
+        android:alpha="0.50"
         android:id="@+id/button" />
 
-    <Button
-        android:layout_width="60dp"
-        android:layout_height="fill_parent"
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:text="@string/right"
+        android:src="@drawable/right"
+        android:scaleType="fitCenter"
+        android:text=""
         android:layout_alignParentRight="true"
         android:id="@+id/button2"
+        android:alpha="0.50"
         android:layout_alignParentTop="true" />
 
 </RelativeLayout>

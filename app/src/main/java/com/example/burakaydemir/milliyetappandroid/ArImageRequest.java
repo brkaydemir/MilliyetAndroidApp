@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import java.io.InputStream;
@@ -34,7 +35,11 @@ public class ArImageRequest extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(result);
+
+
+        if(result!=null)
+            bmImage.setImageBitmap(result);
+
     }
 }
 

@@ -6,7 +6,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.Observable;
 
-//// TODO: 22.1.2016 var bisiler
 
 /**
  * Created by burak.aydemir on 22.1.2016.

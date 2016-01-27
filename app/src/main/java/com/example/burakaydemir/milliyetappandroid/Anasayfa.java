@@ -1,7 +1,9 @@
 package com.example.burakaydemir.milliyetappandroid;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -11,7 +13,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+
+import net.simonvt.menudrawer.MenuDrawer;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -35,6 +41,7 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
     public static boolean PARSE_END;
     public static TextView textView;
 
+    public MenuDrawer mDrawer;
     public XmlPullParser parser;
     public ArSonDakika arSonDakika;
     public ArManset arManset;
@@ -50,6 +57,17 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
     public HavaDurumuLayout havaDurumuLayout2;
     public HavaDurumuLayout havaDurumuLayout3;
     public HavaDurumuLayout havaDurumuLayout4;
+    public TextView piyasalarContent;
+    public ScrollTextView scrolltext;
+    public Button turkiye;
+    public Button dunya;
+    public Button ekonomi;
+    public Button siyaset;
+    public Button yasam;
+    public Button spor;
+    public Button ege;
+    public Button cafe;
+    public Button yazarlar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +76,11 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         StrictMode.setThreadPolicy(policy);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_anasayfa);
+
+        mDrawer = MenuDrawer.attach(this);
+        mDrawer.setMenuView(R.layout.menu_drawer);
+        mDrawer.setContentView(R.layout.activity_anasayfa);
+
 
         BURC_CREATED = false;
         PARSE_END = false;
@@ -83,18 +105,97 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         havaDurumuLayout2=(HavaDurumuLayout)findViewById(R.id.havadurumu_layout2);
         havaDurumuLayout3=(HavaDurumuLayout)findViewById(R.id.havadurumu_layout3);
         havaDurumuLayout4=(HavaDurumuLayout)findViewById(R.id.havadurumu_layout4);
+        //piyasalarContent = (TextView) findViewById(R.id.textView6);
 
+        scrolltext = (ScrollTextView) findViewById(R.id.scrolltext);
 
-        /*
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
-
-
+        turkiye = (Button) findViewById(R.id.button4);
+        dunya = (Button) findViewById(R.id.button5);
+        ekonomi = (Button) findViewById(R.id.button6);
+        siyaset = (Button) findViewById(R.id.button7);
+        yasam = (Button) findViewById(R.id.button8);
+        spor = (Button) findViewById(R.id.button9);
+        ege = (Button) findViewById(R.id.button10);
+        cafe = (Button) findViewById(R.id.button11);
+        yazarlar = (Button) findViewById(R.id.button12);
 
 
 
         //customize layout items
         textView.addTextChangedListener(this);
+
+        turkiye.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(1);
+                mDrawer.closeMenu();
+            }
+        });
+
+        dunya.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(2);
+                mDrawer.closeMenu();
+            }
+        });
+
+        ekonomi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(3);
+                mDrawer.closeMenu();
+            }
+        });
+
+        siyaset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(4);
+                mDrawer.closeMenu();
+            }
+        });
+
+        yasam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(5);
+                mDrawer.closeMenu();
+            }
+        });
+
+        spor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(6);
+                mDrawer.closeMenu();
+            }
+        });
+
+        ege.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(7);
+                mDrawer.closeMenu();
+            }
+        });
+
+        cafe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goKategori(8);
+                mDrawer.closeMenu();
+            }
+        });
+
+        yazarlar.setOnClickListener(new View.OnClickListener() {
+            //// TODO: 26.1.2016 yazarlar degisecek
+            @Override
+            public void onClick(View v) {
+                goKategori(9);
+                mDrawer.closeMenu();
+            }
+        });
 
         //timer threads
         Thread t = new Thread() {
@@ -135,12 +236,8 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
 
         if (networkInfo != null && networkInfo.isConnected())
         {
-            // fetch data
-            new ArRequest().execute(manset_url);
-        }
-        else
-        {
-            ;
+            // download data
+             new ArRequest().execute(manset_url);
         }
 
     }
@@ -193,7 +290,6 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         //PARSING XML Files
         // Create an object of XmlPullParserFactory
         try {
-
             parserInit();
             if(counter==0 && !PARSE_END)
             {
@@ -228,12 +324,77 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
                 arManset.setIndex(0);
                 counter++;
                 textView.removeTextChangedListener(this);
+                setPiyasalar();
                 PARSE_END = true;
             }
-
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void setPiyasalar() {
+
+        String temp="";
+        String spacer="    ";
+
+        for(int i = 0; i<arPiyasa.item_list.size();i++)
+        {
+            if(arPiyasa.item_list.get(i).piyasa_name.equals("BIST"))
+            {
+                temp = temp + "BIST: ";
+                if(arPiyasa.item_list.get(i).status.equals("1"))
+                {
+                    temp = temp + "Borsa bugün %" + arPiyasa.item_list.get(i).percent + " değer kazandı ve "
+                            + arPiyasa.item_list.get(i).value + " puana yükseldi.";
+                }
+                else
+                    temp = temp + "Borsa kan kaybetmeye devam ediyor %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
+                            + arPiyasa.item_list.get(i).value + " puandan kapandı.";
+            }
+            else if(arPiyasa.item_list.get(i).piyasa_name.equals("USD") )
+            {
+                temp = temp + "USD:";
+                if(arPiyasa.item_list.get(i).status.equals("1"))
+                {
+                    temp = temp + "Dolar bugün can yakmaya devam ediyor ve %" + arPiyasa.item_list.get(i).percent + " değer kazanarak  "
+                            + arPiyasa.item_list.get(i).value + " liradan işlem görüyor.";
+                }
+                else
+                    temp = temp + "Dolar yüreklere su serpti. %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
+                            + arPiyasa.item_list.get(i).value + " liradan kapandı.";
+            }
+            else if(arPiyasa.item_list.get(i).piyasa_name.equals("EURO") )
+            {
+                temp = temp + "EURO:";
+                if(arPiyasa.item_list.get(i).status.equals("1"))
+                {
+                    temp = temp + "Merkel bombaladı Avro coştu ve %" + arPiyasa.item_list.get(i).percent + " değer kazanarak  "
+                            + arPiyasa.item_list.get(i).value + " lira ile rekorlar kırdı.";
+                }
+                else
+                    temp = temp + "Avro dolar karşısındaki savaşında yara aldı ve %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
+                            + arPiyasa.item_list.get(i).value + " liradan kapandı.";
+            }
+            else if(arPiyasa.item_list.get(i).piyasa_name.equals("ALTIN") )
+            {
+                temp = temp + "ALTIN:";
+                if(arPiyasa.item_list.get(i).status.equals("1"))
+                {
+                    temp = temp + "Yastıkaltıcılar yaşadı altın %" + arPiyasa.item_list.get(i).percent + " değer kazandı  "
+                            + arPiyasa.item_list.get(i).value + " lira.";
+                }
+                else
+                    temp = temp + "Sarı lira yatırımcıları endişeli %" + arPiyasa.item_list.get(i).percent + " düşerek  "
+                            + arPiyasa.item_list.get(i).value + " liradan satıldı.";
+            }
+            temp = temp + spacer;
+        }
+        scrolltext
+                .setText(temp);
+        scrolltext.setTextColor(Color.BLACK);
+        scrolltext.startScroll();
+        //piyasalarContent.setText(temp);
     }
 
     @Override
@@ -317,9 +478,20 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
 
     }
 
+    public void goKategori(int id)
+    {
+        Intent intent = new Intent(this,KategoriActivity.class);
+        intent.putExtra("kategori_type",Integer.toString(id));
+
+        startActivity(intent);
+    }
+
     @Override
     public void goSonDakikaArticle() {
+        Intent intent = new Intent(this,ArticleActivity.class);
+        intent.putExtra("article_url",arSonDakika.item_list.get(arSonDakika.show_index).article_id);
 
+        startActivity(intent);
     }
 
     @Override

@@ -7,24 +7,40 @@
     android:layout_height="fill_parent"
     tools:context="com.example.burakaydemir.milliyetappandroid.Anasayfa">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appbarlayout"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:background="#ffff0f0f"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="40dp"
+            android:text="@string/app_name"
+            style="@style/Base.TextAppearance.AppCompat.Headline" />
+
+    </android.support.design.widget.AppBarLayout>
+
     <TextView
         android:id="@+id/textview"
         android:layout_width="wrap_content"
         android:visibility="invisible"
         android:layout_height="wrap_content" />
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView3"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/milliyet" />
+
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageView3">
+        android:nestedScrollingEnabled="true"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_below="@id/appbarlayout">
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -41,6 +57,7 @@
             <com.example.burakaydemir.milliyetappandroid.MansetLayout
                 android:id="@+id/customLayout"
                 android:layout_width="fill_parent"
+                android:paddingTop="16dp"
                 android:layout_height="250dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"/>
@@ -54,7 +71,7 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="250dp"
                 android:id="@+id/linear_layout1"
                 android:layout_below="@+id/sondakika_layout"
                 android:layout_alignParentLeft="true"
@@ -129,14 +146,19 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:text="Piyasalar"
+                    android:text="   Piyasalar   "
+                    android:textAlignment="center"
+                    android:textSize="20dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:background="#10af02"
                     android:id="@+id/textView5" />
 
-                <TextView
+                <com.example.burakaydemir.milliyetappandroid.ScrollTextView
                     android:layout_width="fill_parent"
-                    android:layout_height="30dp"
-                    android:id="@+id/textView6"
-                    android:scrollHorizontally="true"/>
+                    android:layout_height="wrap_content"
+                    android:id="@+id/scrolltext"/>
             </LinearLayout>
 
         </RelativeLayout>

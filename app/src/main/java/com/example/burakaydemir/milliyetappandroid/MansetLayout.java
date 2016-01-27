@@ -15,8 +15,8 @@ import android.widget.RelativeLayout;
  */
 public class MansetLayout extends RelativeLayout {
 
-    public Button right_button;
-    public Button left_button;
+    public ImageButton right_button;
+    public ImageButton left_button;
     public ImageButton image_view;
     public IAnasayfa ianasayfa;
 
@@ -42,8 +42,8 @@ public class MansetLayout extends RelativeLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        left_button = (Button) findViewById(R.id.button);
-        right_button = (Button) findViewById(R.id.button2);
+        left_button = (ImageButton) findViewById(R.id.button);
+        right_button = (ImageButton) findViewById(R.id.button2);
         image_view = (ImageButton) findViewById(R.id.imageView);
 
         left_button.setOnClickListener(new OnClickListener() {

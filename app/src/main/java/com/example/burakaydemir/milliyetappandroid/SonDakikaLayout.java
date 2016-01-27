@@ -41,7 +41,7 @@ public class SonDakikaLayout extends RelativeLayout
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO son dakika detay activity
+                ianasayfa.goSonDakikaArticle();
             }
         });
 

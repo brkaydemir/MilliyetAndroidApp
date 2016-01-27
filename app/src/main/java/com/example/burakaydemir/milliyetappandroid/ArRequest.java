@@ -125,10 +125,5 @@ public class ArRequest extends AsyncTask<String, Void, String>
         //return new String(buffer);
         return total.toString();
     }
-
-
-
-
 }
-
 

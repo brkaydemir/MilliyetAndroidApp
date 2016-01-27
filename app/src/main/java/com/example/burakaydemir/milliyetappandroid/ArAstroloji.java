@@ -1,5 +1,7 @@
 package com.example.burakaydemir.milliyetappandroid;
 
+import android.util.Log;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -105,6 +107,7 @@ public class ArAstroloji extends Observable {
                 parser.nextTag();
                 parser.next();
                 burc_spot = parser.getText().trim();
+                cleanText();
                 parser.nextTag();
                 parser.nextTag();
                 parser.next();
@@ -119,5 +122,21 @@ public class ArAstroloji extends Observable {
             }
             burc_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
         }
+
+        public void cleanText()
+        {
+            burc_spot=burc_spot.replaceAll("<p>","");
+            burc_spot=burc_spot.replaceAll("&ccedil;","ç");
+            burc_spot=burc_spot.replaceAll("&Ccedil;","Ç");
+            burc_spot=burc_spot.replaceAll("&nbsp;","");
+            burc_spot=burc_spot.replaceAll("&ouml;","ö");
+            burc_spot=burc_spot.replaceAll("&Ouml;","Ö");
+            burc_spot=burc_spot.replaceAll("&uuml;","ü");
+            burc_spot=burc_spot.replaceAll("&Uuml;","Ü");
+            burc_spot=burc_spot.replaceAll("</p>","");
+            burc_spot=burc_spot.replaceAll("<br />","");
+        }
     }
+
+
 }

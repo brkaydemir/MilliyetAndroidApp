@@ -8,20 +8,20 @@ import java.util.ArrayList;
 import java.util.Observable;
 
 /**
- * Created by burak.aydemir on 4.1.2016.
+ * Created by burak.aydemir on 26.1.2016.
  */
-public class ArManset extends Observable
-{
-    public final String TAG = "ArManset";
-    public final String url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=Samsung11liManset";
+public class ArKategori extends Observable {
 
-    public ArrayList<MansetItem> item_list;
-    public int show_index;
+    public ArrayList<KategoriItem> item_list;
+    public int id;
 
-    public ArManset()
+    public final String TAG = "ArAstroloji";
+    public final String url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungKategoriListe&CategoryID=";
+
+    public ArKategori(String id)
     {
-        item_list = new ArrayList<MansetItem>();
-        show_index = 0;
+        item_list= new ArrayList<KategoriItem>();
+        this.id = Integer.parseInt(id);
     }
 
     public void parse(XmlPullParser parser)
@@ -35,13 +35,13 @@ public class ArManset extends Observable
                     if(parser.getName().equals("root"))
                     {
                         event=parser.nextTag();
-                        MansetItem temp = new MansetItem();
+                        KategoriItem temp = new KategoriItem();
                         temp.reader(parser);
                         item_list.add(temp);
                     }
                     else if(parser.getName().equals("item"))
                     {
-                        MansetItem temp = new MansetItem();
+                        KategoriItem temp = new KategoriItem();
                         temp.reader(parser);
                         item_list.add(temp);
                     }
@@ -55,59 +55,53 @@ public class ArManset extends Observable
         }
     }
 
-    public void inc_index()
-    {
-        show_index++;
-        if(show_index>=item_list.size()) show_index=0;
-        setChanged();
-        notifyObservers();
-    }
-    public void dec_index()
-    {
-        show_index--;
-        if(show_index<0) show_index=item_list.size()-1;
-        setChanged();
-        notifyObservers();
-    }
-    public void setIndex(int i)
-    {
-        show_index = i;
-        if(show_index>=item_list.size()) show_index=item_list.size()-1;
-        if(show_index<0) show_index=0;
-        setChanged();
-        notifyObservers();
-    }
+    public class KategoriItem {
 
-    public class MansetItem {
+        public String category_id;
+        public String subcategory_name;
+        public String main_category_name;
+        public String article_publish_date;
         public String article_id;
-        public String article_title_manset;
-        public String big_image_url;
-        public String small_image_url;
-        public String manset_url;
-
+        public String article_title_detay;
+        public String rowno;
+        public String file_url;
+        public String article_url;
 
         public void reader(XmlPullParser parser)
         {
-
-            article_id="";
             try {
-                int event=parser.getEventType();
 
+                parser.nextTag();
+                parser.next();
+                category_id = parser.getText().trim();
+                parser.nextTag();
+                parser.nextTag();
+                parser.next();
+                subcategory_name = parser.getText().trim();
+                parser.nextTag();
+                parser.nextTag();
+                parser.next();
+                main_category_name = parser.getText().trim();
+                parser.nextTag();
+                parser.nextTag();
+                parser.next();
+                article_publish_date = parser.getText().trim();
+                parser.nextTag();
                 parser.nextTag();
                 parser.next();
                 article_id = parser.getText().trim();
                 parser.nextTag();
                 parser.nextTag();
                 parser.next();
-                article_title_manset = parser.getText().trim();
+                article_title_detay = parser.getText().trim();
                 parser.nextTag();
                 parser.nextTag();
                 parser.next();
-                big_image_url = parser.getText().trim();
+                rowno = parser.getText().trim();
                 parser.nextTag();
                 parser.nextTag();
                 parser.next();
-                small_image_url = parser.getText().trim();
+                file_url = parser.getText().trim();
                 parser.nextTag();
                 parser.nextTag();
 
@@ -116,7 +110,8 @@ public class ArManset extends Observable
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            manset_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
+            article_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
         }
     }
+
 }
