@@ -1,18 +1,16 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import android.util.Log;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 
 /**
  * Created by burak.aydemir on 4.1.2016.
  */
 public class ArAstroloji extends Observable {
+
+    public static final String BURC_SPOT = "Spot";
+
     public ArrayList<AstrolojiItem> item_list;
     public int show_index;
 
@@ -24,34 +22,20 @@ public class ArAstroloji extends Observable {
         item_list= new ArrayList<AstrolojiItem>();
         show_index=6;
     }
-    public void parse(XmlPullParser parser)
-    {
-        try {
-            int event = parser.getEventType();
 
-            while(event!= XmlPullParser.END_DOCUMENT){
-                if(event == XmlPullParser.START_TAG)
-                {
-                    if(parser.getName().equals("root"))
-                    {
-                        event=parser.nextTag();
-                        AstrolojiItem temp = new AstrolojiItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                    else if(parser.getName().equals("item"))
-                    {
-                        AstrolojiItem temp = new AstrolojiItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                }
-                event = parser.nextTag();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public ArAstroloji(String str)
+    {
+        item_list = new ArrayList<AstrolojiItem>();
+        show_index = 0;
+
+        ArParser myparser = new ArParser(str);
+        HashMap<String,String> temp = new HashMap<String,String>();
+        while((temp = myparser.reader()) != null)
+        {
+            AstrolojiItem tempItem = new AstrolojiItem();
+            tempItem.elements = temp;
+            //tempItem.cleanText();
+            item_list.add(tempItem);
         }
     }
 
@@ -80,51 +64,16 @@ public class ArAstroloji extends Observable {
 
     public class AstrolojiItem {
 
-        public String article_id;
-        public String burc_name;
-        public String burc_title;
-        public String burc_spot;
-        public String spot_manset;
-        public String burc_url;
+        public HashMap<String, String> elements;
 
-
-        public void reader(XmlPullParser parser)
-        {
-            try {
-
-                parser.nextTag();
-                parser.next();
-                article_id = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                burc_name = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                burc_title = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                burc_spot = parser.getText().trim();
-                cleanText();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                spot_manset = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            burc_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
+        public AstrolojiItem() {
+            elements = new HashMap<String, String>();
         }
-
+        //TODO clean text calısmıyor düzelt
         public void cleanText()
         {
+            String burc_spot = elements.get(ArAstroloji.BURC_SPOT);
+
             burc_spot=burc_spot.replaceAll("<p>","");
             burc_spot=burc_spot.replaceAll("&ccedil;","ç");
             burc_spot=burc_spot.replaceAll("&Ccedil;","Ç");
@@ -135,6 +84,9 @@ public class ArAstroloji extends Observable {
             burc_spot=burc_spot.replaceAll("&Uuml;","Ü");
             burc_spot=burc_spot.replaceAll("</p>","");
             burc_spot=burc_spot.replaceAll("<br />","");
+
+            elements.remove(ArAstroloji.BURC_SPOT);
+            elements.put(ArAstroloji.BURC_SPOT,burc_spot);
         }
     }
 

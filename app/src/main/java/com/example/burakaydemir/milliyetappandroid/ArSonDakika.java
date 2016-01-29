@@ -1,13 +1,7 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import android.util.Log;
-import android.util.Xml;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 
 /**
@@ -15,6 +9,9 @@ import java.util.Observable;
  */
 public class ArSonDakika extends Observable
 {
+    public static final String ARTICLE_ID = "ArticleID";
+    public static final String ARTICLE_TITLE_DETAIL = "ArticleTitleDetay";
+
     public ArrayList<SonDakikaItem> item_list;
     public int show_index;
 
@@ -27,35 +24,18 @@ public class ArSonDakika extends Observable
         show_index = 0;
     }
 
-    public void parse (XmlPullParser parser)
+    public ArSonDakika(String str)
     {
+        item_list = new ArrayList<SonDakikaItem>();
+        show_index = 0;
 
-        try {
-            int event = parser.getEventType();
-
-            while(event!= XmlPullParser.END_DOCUMENT){
-                if(event == XmlPullParser.START_TAG)
-                {
-                    if(parser.getName().equals("root"))
-                    {
-                        event=parser.nextTag();
-                        SonDakikaItem temp = new SonDakikaItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                    else if(parser.getName().equals("item"))
-                    {
-                        SonDakikaItem temp = new SonDakikaItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                }
-                event = parser.nextTag();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        ArParser myparser = new ArParser(str);
+        HashMap<String,String> temp = new HashMap<String,String>();
+        while((temp = myparser.reader()) != null)
+        {
+            SonDakikaItem tempItem = new SonDakikaItem();
+            tempItem.elements = temp;
+            item_list.add(tempItem);
         }
     }
 
@@ -84,40 +64,10 @@ public class ArSonDakika extends Observable
 
     public class SonDakikaItem {
 
-        public String article_id;
-        public String article_title_detay;
-        public String publish_hour;
-        public String publish_minute;
-        public String article_url;
+        public HashMap<String, String> elements;
 
-
-        public void reader(XmlPullParser parser)
-        {
-            try {
-                parser.nextTag();
-                parser.next();
-                article_id = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                article_title_detay = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                publish_hour = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                publish_minute = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            article_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
+        public SonDakikaItem() {
+            elements = new HashMap<String, String>();
         }
     }
 }

@@ -1,15 +1,18 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Observable;
 
 /**
  * Created by burak.aydemir on 4.1.2016.
  */
-public class ArPiyasa {
+public class ArPiyasa extends Observable {
+
+    public static final String PIYASA_NAME = "Name";
+    public static final String VALUE = "Value";
+    public static final String PERCENT = "Percent";
+    public static final String STATUS = "Status";
 
     public ArrayList<PiyasaItem> item_list;
 
@@ -21,72 +24,47 @@ public class ArPiyasa {
         item_list = new ArrayList<PiyasaItem>();
     }
 
-    public void parse(XmlPullParser parser)
+    public ArPiyasa(String str)
     {
-        try {
-            int event = parser.getEventType();
+        item_list = new ArrayList<PiyasaItem>();
 
-            while(event!= XmlPullParser.END_DOCUMENT){
-                if(event == XmlPullParser.START_TAG)
-                {
-                    if(parser.getName().equals("root"))
-                    {
-                        event=parser.nextTag();
-                        PiyasaItem temp = new PiyasaItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                    else if(parser.getName().equals("item"))
-                    {
-                        PiyasaItem temp = new PiyasaItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                }
-                event = parser.nextTag();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        ArParser myparser = new ArParser(str);
+        HashMap<String,String> temp = new HashMap<String,String>();
+        while((temp = myparser.reader()) != null)
+        {
+            PiyasaItem tempItem = new PiyasaItem();
+            tempItem.elements = temp;
+            item_list.add(tempItem);
         }
+        setChanged();
+        notifyObservers();
+    }
+
+    public void parse(String str)
+    {
+        item_list = new ArrayList<PiyasaItem>();
+
+
+        ArParser myparser = new ArParser(str);
+        HashMap<String,String> temp = new HashMap<String,String>();
+        PiyasaItem tempItem;
+        while((temp = myparser.reader()) != null)
+        {
+
+            tempItem = new PiyasaItem();
+            tempItem.elements = temp;
+            item_list.add(tempItem);
+        }
+        setChanged();
+        notifyObservers();
     }
 
     public class PiyasaItem
     {
-        public String piyasa_name;
-        public String value;
-        public String percent;
-        public String status;
+        public HashMap<String, String> elements;
 
-        public void reader(XmlPullParser parser)
-        {
-            try {
-
-                parser.nextTag();
-                parser.next();
-                piyasa_name = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                value = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                percent = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                status = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //burc_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
+        public PiyasaItem() {
+            elements = new HashMap<String, String>();
         }
     }
 }

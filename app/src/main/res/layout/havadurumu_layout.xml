@@ -12,7 +12,6 @@
         android:layout_height="match_parent"
         android:paddingTop="16dp"
         android:id="@+id/imageView3"
-        android:src="@drawable/kar2"
         android:scaleType="fitXY" />
 
     <TextView

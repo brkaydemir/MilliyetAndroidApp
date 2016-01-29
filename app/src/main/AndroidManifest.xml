@@ -22,7 +22,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ArticleActivity" />
-        <activity android:name=".KategoriActivity"></activity>
+        <activity android:name=".KategoriActivity" />
+        <activity
+            android:name=".YazarlarActivity"
+            android:label="@string/title_activity_yazarlar"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -109,9 +109,7 @@ public class ScrollTextView extends TextView {
         Rect rect = new Rect();
         String strTxt = getText().toString();
         tp.getTextBounds(strTxt, 0, strTxt.length(), rect);
-        int scrollingLen = rect.width() + getWidth();
-        rect = null;
-        return scrollingLen;
+        return rect.width() + getWidth();
     }
 
     /**

@@ -3,8 +3,6 @@ package com.example.burakaydemir.milliyetappandroid;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import java.io.InputStream;
@@ -27,9 +25,8 @@ public class ArImageRequest extends AsyncTask<String, Void, Bitmap> {
         try {
             InputStream in = new URL(urldisplay).openStream();
             mIcon11 = BitmapFactory.decodeStream(in);
-        } catch (Exception e) {
-            //Log.e("Error", e.getMessage());
-            e.printStackTrace();
+        } catch (Exception ignored) {
+
         }
         return mIcon11;
     }

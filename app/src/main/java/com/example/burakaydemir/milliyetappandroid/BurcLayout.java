@@ -1,20 +1,14 @@
 package com.example.burakaydemir.milliyetappandroid;
 
 import android.content.Context;
-import android.media.Image;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by burak.aydemir on 8.1.2016.
@@ -59,7 +53,6 @@ public class BurcLayout extends RelativeLayout
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // On selecting a spinner item
-                String item = parent.getItemAtPosition(position).toString();
                 if(Anasayfa.BURC_CREATED)
                     ianasayfa.setBurc(parent.getSelectedItemPosition());
                 // Showing selected spinner item

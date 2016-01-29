@@ -1,10 +1,7 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 
 /**
@@ -12,6 +9,9 @@ import java.util.Observable;
  */
 public class ArManset extends Observable
 {
+    public static final String ARTICLE_ID = "ArticleID";
+    public static final String BIG_IMAGE_URL = "MansetBuyukImage";
+
     public final String TAG = "ArManset";
     public final String url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=Samsung11liManset";
 
@@ -24,36 +24,22 @@ public class ArManset extends Observable
         show_index = 0;
     }
 
-    public void parse(XmlPullParser parser)
+    public ArManset(String str)
     {
-        try {
-            int event = parser.getEventType();
+        item_list = new ArrayList<MansetItem>();
+        show_index = 0;
 
-            while(event!= XmlPullParser.END_DOCUMENT){
-                if(event == XmlPullParser.START_TAG)
-                {
-                    if(parser.getName().equals("root"))
-                    {
-                        event=parser.nextTag();
-                        MansetItem temp = new MansetItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                    else if(parser.getName().equals("item"))
-                    {
-                        MansetItem temp = new MansetItem();
-                        temp.reader(parser);
-                        item_list.add(temp);
-                    }
-                }
-                event = parser.nextTag();
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        ArParser myparser = new ArParser(str);
+        HashMap<String,String> temp = new HashMap<String,String>();
+        while((temp = myparser.reader()) != null)
+        {
+            MansetItem tempItem = new MansetItem();
+            tempItem.elements = temp;
+            item_list.add(tempItem);
         }
     }
+
 
     public void inc_index()
     {
@@ -79,44 +65,12 @@ public class ArManset extends Observable
     }
 
     public class MansetItem {
-        public String article_id;
-        public String article_title_manset;
-        public String big_image_url;
-        public String small_image_url;
-        public String manset_url;
 
+        public HashMap<String,String> elements;
 
-        public void reader(XmlPullParser parser)
+        public MansetItem()
         {
-
-            article_id="";
-            try {
-                int event=parser.getEventType();
-
-                parser.nextTag();
-                parser.next();
-                article_id = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                article_title_manset = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                big_image_url = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-                parser.next();
-                small_image_url = parser.getText().trim();
-                parser.nextTag();
-                parser.nextTag();
-
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            manset_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=" + article_id ;
+            elements = new HashMap<String,String>();
         }
     }
 }

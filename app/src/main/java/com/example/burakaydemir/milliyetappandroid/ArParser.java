@@ -1,7 +1,5 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import android.support.annotation.NonNull;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -9,10 +7,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by burak.aydemir on 27.1.2016.
@@ -30,12 +26,13 @@ public class ArParser {
             parser = XmlProcessor.newPullParser();
             parser.setInput(new StringReader(data));
 
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
+        } catch (XmlPullParserException ignored) {
+
         }
 
     }
 
+    @Deprecated
     public ArrayList<Map<String,String>> parse()
     {
         ArrayList<Map<String,String>> result = new ArrayList<Map<String,String>>();
@@ -55,37 +52,47 @@ public class ArParser {
                 }
                 event = parser.nextTag();
             }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (XmlPullParserException | IOException ignored) {
+
         }
         return result;
     }
 
-    private Map<String, String> reader() {
+    public HashMap<String, String> reader() {
 
         int event = 0;
-        Map<String,String> result = new HashMap<String,String>();
+        HashMap<String,String> result = new HashMap<String,String>();
         String key;
         String value;
         try {
             event = parser.getEventType();
+            while(true)
+            {
+                if(event == XmlPullParser.START_TAG && parser.getName().equals("item")) break;
 
-            while(event!= XmlPullParser.END_TAG && !parser.getName().equals("item")){
+                if(event == XmlPullParser.END_DOCUMENT)
+                    return null;
+
+                event = parser.nextTag();
+            }
+            event = parser.nextTag();
+            while(true){
+                if(event== XmlPullParser.END_TAG && parser.getName().equals("item")) break;
                 if(event == XmlPullParser.START_TAG)
                 {
                     key = parser.getName();
+                    //Log.d("parser", "reader: " + parser.getName());
                     parser.next();
-                    value = parser.getText().toString().trim();
+                    //Log.d("parser", "reader: " + parser.getText());
+                    value = parser.getText().trim();
                     result.put(key,value);
                 }
+                if(event == XmlPullParser.END_DOCUMENT)
+                    return null;
                 event = parser.nextTag();
             }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (XmlPullParserException | IOException ignored) {
+
         }
 
         return result;

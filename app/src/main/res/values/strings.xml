@@ -18,5 +18,6 @@
         <item>İkizler</item>
         <item>Boğa</item>
     </string-array>
+    <string name="title_activity_yazarlar">YazarlarActivity</string>
 
 </resources>

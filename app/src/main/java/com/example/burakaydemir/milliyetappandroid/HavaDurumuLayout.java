@@ -1,9 +1,9 @@
 package com.example.burakaydemir.milliyetappandroid;
 
 import android.content.Context;
-import android.sax.TextElementListener;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,6 +16,7 @@ public class HavaDurumuLayout extends RelativeLayout {
     public TextView location;
     public TextView status_text;
     public TextView temperature;
+    public ImageView image;
 
     public HavaDurumuLayout(Context context) {
         this(context, null, 0);
@@ -40,6 +41,7 @@ public class HavaDurumuLayout extends RelativeLayout {
         location = (TextView) findViewById(R.id.textView2);
         status_text = (TextView) findViewById(R.id.textView3);
         temperature = (TextView) findViewById(R.id.textView4);
+        image = (ImageView) findViewById(R.id.imageView3);
 
     }
 }

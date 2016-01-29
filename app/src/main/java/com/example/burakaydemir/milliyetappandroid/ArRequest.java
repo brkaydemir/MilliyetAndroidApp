@@ -1,18 +1,7 @@
 package com.example.burakaydemir.milliyetappandroid;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.Xml;
-import android.view.View;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,15 +10,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Created by burak.aydemir on 25.12.2015.
@@ -44,12 +25,64 @@ public class ArRequest extends AsyncTask<String, Void, String>
     private final String astroloji_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungAstroloji";
     private final String hava_durumu_detay_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHavaDurumu";
     private final String manset_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=Samsung11liManset";
+    private final String kategori_detay = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungKategoriListe&CategoryID=";
+    private final String haber_detay = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHaber&ArticleID=";
 
-    private InputStream httpStream;
 
+    public ArResponse responseHandler;
+    public String request_url;
+    public int type;
+    public int id;
 
 
     public ArRequest( ) {
+    }
+
+    //type = 0(anasayfa), id=layoutID (manset,sondakika,burc,havadurumu,piyasa)
+    //type = 1(kategori), id=kategoriID
+    //type = 2(article),  id=articleID
+    //type = 3(yazarlar)  id=not important
+    public ArRequest( int type , int id)
+    {
+        this.type = type;
+        this.id = id;
+        if(type == 0)
+        {
+            //anasayfa request
+            if(id==1)
+            {
+                request_url = manset_url;
+            }
+            else if(id==2)
+            {
+                request_url = son_dakika_url;
+            }
+            else if(id==3)
+            {
+                request_url = astroloji_url;
+            }
+            else if(id==4)
+            {
+                request_url = hava_durumu_detay_url;
+            }
+            else if(id==5)
+            {
+                request_url = piyasalar_url;
+            }
+        }
+        else if(type == 1)
+        {
+            //kategori request
+            request_url = kategori_detay + Integer.toString(id);
+        }
+        else if(type == 2)
+        {
+            request_url = haber_detay + Integer.toString(id);
+        }
+        else if(type == 3)
+        {
+            request_url = yazarlar_url;
+        }
     }
 
 
@@ -58,16 +91,17 @@ public class ArRequest extends AsyncTask<String, Void, String>
 
         // params comes from the execute() call: params[0] is the url.
         try {
-            return downloadUrl(urls[0]);
-        } catch (IOException e) {
-            return "Unable to retrieve web page. URL may be invalid.";
+            return downloadUrl(request_url);
+        } catch (IOException ignored) {
+
         }
+        return null;
     }
 
     // onPostExecute displays the results of the AsyncTask.
     @Override
     protected void onPostExecute(String result) {
-        Anasayfa.textView.setText(result);
+        responseHandler.finishTask(result, type, id);
     }
 
     // Given a URL, establishes an HttpUrlConnection and retrieves
@@ -88,14 +122,13 @@ public class ArRequest extends AsyncTask<String, Void, String>
             conn.setDoInput(true);
             // Starts the query
             conn.connect();
-            int response = conn.getResponseCode();
             //Log.d("ArRequest", "The response is: " + response);
             is = conn.getInputStream();
 
             // Convert the InputStream into a string
-            String contentAsString = readIt(is, len);
+            //String contentAsString = readIt(is, len);
             //Log.d("before return str", "downloadUrl: ");
-            return contentAsString;
+            return readIt(is, len);
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -106,9 +139,8 @@ public class ArRequest extends AsyncTask<String, Void, String>
         }
     }
     // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        httpStream = stream;
+    public String readIt(InputStream stream, int len) throws IOException {
+        Reader reader;
         reader = new InputStreamReader(stream, "UTF-8");
         //parse(stream);
 
@@ -116,13 +148,11 @@ public class ArRequest extends AsyncTask<String, Void, String>
         StringBuilder total = new StringBuilder();
         String line;
         while ((line = r.readLine()) != null) {
-            total.append(line+'\n');
+            total.append(line).append('\n');
         }
 
         char[] buffer = new char[len];
         reader.read(buffer);
-        //Log.d("read", "readIt: ");
-        //return new String(buffer);
         return total.toString();
     }
 }

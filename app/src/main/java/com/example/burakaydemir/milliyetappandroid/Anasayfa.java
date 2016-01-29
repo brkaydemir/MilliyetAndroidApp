@@ -1,6 +1,5 @@
 package com.example.burakaydemir.milliyetappandroid;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -9,44 +8,26 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import net.simonvt.menudrawer.MenuDrawer;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.StringReader;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer, IAnasayfa {
+public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, ArResponse {
 
-    private final String son_dakika_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungSonDakika";
-    private final String hava_durumu_ana_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHavaDurumuAnasayfa";
-    private final String piyasalar_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungPiyasalar";
-    private final String yazarlar_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungYazar";
-    private final String son_dakika_liste_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungSonDakikaListe";
-    private final String astroloji_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungAstroloji";
-    private final String hava_durumu_detay_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=SamsungHavaDurumu";
-    private final String manset_url = "http://mw.milliyet.com.tr/ashx/Milliyet.ashx?aType=Samsung11liManset";
-    public static boolean BURC_CREATED;
-    public static boolean PARSE_END;
     public static TextView textView;
 
+    public static boolean BURC_CREATED;
+    public static boolean PARSE_END;
+
     public MenuDrawer mDrawer;
-    public XmlPullParser parser;
     public ArSonDakika arSonDakika;
     public ArManset arManset;
     public final String TAG = "MilliyetApp";
-    public int counter;
     public ArAstroloji arAstroloji;
     public ArHavaDurumu arHavaDurumu;
     public ArPiyasa arPiyasa;
@@ -57,7 +38,6 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
     public HavaDurumuLayout havaDurumuLayout2;
     public HavaDurumuLayout havaDurumuLayout3;
     public HavaDurumuLayout havaDurumuLayout4;
-    public TextView piyasalarContent;
     public ScrollTextView scrolltext;
     public Button turkiye;
     public Button dunya;
@@ -85,21 +65,11 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         BURC_CREATED = false;
         PARSE_END = false;
 
-        arSonDakika = new ArSonDakika();
-        arManset = new ArManset();
-        arAstroloji = new ArAstroloji();
-        arHavaDurumu = new ArHavaDurumu();
-        arPiyasa = new ArPiyasa();
 
-
-        //adding observer to observables
-        arManset.addObserver(this);
-        arSonDakika.addObserver(this);
 
         //layout hooking
         mansetLayout = (MansetLayout) findViewById(R.id.customLayout);
         sonDakikaLayout = (SonDakikaLayout) findViewById(R.id.sondakika_layout);
-        textView = (TextView) findViewById(R.id.textview);
         burcLayout = (BurcLayout) findViewById(R.id.burc_layout);
         havaDurumuLayout1=(HavaDurumuLayout)findViewById(R.id.havadurumu_layout1);
         havaDurumuLayout2=(HavaDurumuLayout)findViewById(R.id.havadurumu_layout2);
@@ -120,9 +90,6 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         yazarlar = (Button) findViewById(R.id.button12);
 
 
-
-        //customize layout items
-        textView.addTextChangedListener(this);
 
         turkiye.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +159,7 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
             //// TODO: 26.1.2016 yazarlar degisecek
             @Override
             public void onClick(View v) {
-                goKategori(9);
+                goYazar();
                 mDrawer.closeMenu();
             }
         });
@@ -212,7 +179,7 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
                             }
                         });
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
         };
@@ -222,13 +189,12 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
 
     }
 
+
+
     @Override
     protected void onStart()
     {
         super.onStart();
-
-
-        counter = 0;
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -237,9 +203,26 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         if (networkInfo != null && networkInfo.isConnected())
         {
             // download data
-             new ArRequest().execute(manset_url);
-        }
+            ArRequest request1 = new ArRequest(0,1);
+            request1.responseHandler = this;
+            request1.execute();
 
+            ArRequest request2 = new ArRequest(0,2);
+            request2.responseHandler = this;
+            request2.execute();
+
+            ArRequest request3 = new ArRequest(0,3);
+            request3.responseHandler = this;
+            request3.execute();
+
+            ArRequest request4 = new ArRequest(0,4);
+            request4.responseHandler = this;
+            request4.execute();
+
+            ArRequest request5 = new ArRequest(0,5);
+            request5.responseHandler = this;
+            request5.execute();
+        }
     }
 
     @Override
@@ -266,127 +249,60 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         return super.onOptionsItemSelected(item);
     }
 
-    void parserInit() throws XmlPullParserException
-    {
-        XmlPullParserFactory XmlProcessor = XmlPullParserFactory.newInstance();
-        XmlProcessor.setNamespaceAware(true);
-        parser = XmlProcessor.newPullParser();
-        parser.setInput(new StringReader(textView.getText().toString()));
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
-        //PARSING XML Files
-        // Create an object of XmlPullParserFactory
-        try {
-            parserInit();
-            if(counter==0 && !PARSE_END)
-            {
-                arManset.parse(parser);
-                new ArRequest().execute(son_dakika_url);
-                counter++;
-            }
-            else if(counter==1 && !PARSE_END) {
-                arSonDakika.parse(parser);
-                new ArRequest().execute(astroloji_url);
-                counter++;
-            }
-            else if(counter==2 && !PARSE_END)
-            {
-                arAstroloji.parse(parser);
-                BURC_CREATED = true;
-                burcLayout.spinner.setSelection(10);
-                setBurc(10);
-                new ArRequest().execute(hava_durumu_detay_url);
-                counter++;
-            }
-            else if(counter==3 && !PARSE_END)
-            {
-                arHavaDurumu.parse(parser);
-                setHavaDurumu();
-                new ArRequest().execute(piyasalar_url);
-                counter++;
-            }
-            else if(counter==4 && !PARSE_END)
-            {
-                arPiyasa.parse(parser);
-                arManset.setIndex(0);
-                counter++;
-                textView.removeTextChangedListener(this);
-                setPiyasalar();
-                PARSE_END = true;
-            }
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private void setPiyasalar() {
 
         String temp="";
         String spacer="    ";
 
-        for(int i = 0; i<arPiyasa.item_list.size();i++)
+        for(int i = 0; i<arPiyasa.item_list.size()-1;i++)
         {
-            if(arPiyasa.item_list.get(i).piyasa_name.equals("BIST"))
+            if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.PIYASA_NAME).equals("BIST"))
             {
                 temp = temp + "BIST: ";
-                if(arPiyasa.item_list.get(i).status.equals("1"))
+                if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.STATUS).equals("1"))
                 {
-                    temp = temp + "Borsa bugün %" + arPiyasa.item_list.get(i).percent + " değer kazandı ve "
-                            + arPiyasa.item_list.get(i).value + " puana yükseldi.";
+                    temp = temp + "Borsa bugün %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " değer kazandı ve "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " puana yükseldi.";
                 }
                 else
-                    temp = temp + "Borsa kan kaybetmeye devam ediyor %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
-                            + arPiyasa.item_list.get(i).value + " puandan kapandı.";
+                    temp = temp + "Borsa kan kaybetmeye devam ediyor %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " düşüşle  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " puandan kapandı.";
             }
-            else if(arPiyasa.item_list.get(i).piyasa_name.equals("USD") )
+            else if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.PIYASA_NAME).equals("USD") )
             {
                 temp = temp + "USD:";
-                if(arPiyasa.item_list.get(i).status.equals("1"))
+                if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.STATUS).equals("1"))
                 {
-                    temp = temp + "Dolar bugün can yakmaya devam ediyor ve %" + arPiyasa.item_list.get(i).percent + " değer kazanarak  "
-                            + arPiyasa.item_list.get(i).value + " liradan işlem görüyor.";
+                    temp = temp + "Dolar bugün can yakmaya devam ediyor ve %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " değer kazanarak  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " liradan işlem görüyor.";
                 }
                 else
-                    temp = temp + "Dolar yüreklere su serpti. %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
-                            + arPiyasa.item_list.get(i).value + " liradan kapandı.";
+                    temp = temp + "Dolar yüreklere su serpti. %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " düşüşle  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " liradan kapandı.";
             }
-            else if(arPiyasa.item_list.get(i).piyasa_name.equals("EURO") )
+            else if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.PIYASA_NAME).equals("EURO") )
             {
                 temp = temp + "EURO:";
-                if(arPiyasa.item_list.get(i).status.equals("1"))
+                if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.STATUS).equals("1"))
                 {
-                    temp = temp + "Merkel bombaladı Avro coştu ve %" + arPiyasa.item_list.get(i).percent + " değer kazanarak  "
-                            + arPiyasa.item_list.get(i).value + " lira ile rekorlar kırdı.";
+                    temp = temp + "Merkel bombaladı Avro coştu ve %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " değer kazanarak  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " lira ile rekorlar kırdı.";
                 }
                 else
-                    temp = temp + "Avro dolar karşısındaki savaşında yara aldı ve %" + arPiyasa.item_list.get(i).percent + " düşüşle  "
-                            + arPiyasa.item_list.get(i).value + " liradan kapandı.";
+                    temp = temp + "Avro dolar karşısındaki savaşında yara aldı ve %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " düşüşle  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " liradan kapandı.";
             }
-            else if(arPiyasa.item_list.get(i).piyasa_name.equals("ALTIN") )
+            else if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.PIYASA_NAME).equals("ALTIN") )
             {
                 temp = temp + "ALTIN:";
-                if(arPiyasa.item_list.get(i).status.equals("1"))
+                if(arPiyasa.item_list.get(i).elements.get(ArPiyasa.STATUS).equals("1"))
                 {
-                    temp = temp + "Yastıkaltıcılar yaşadı altın %" + arPiyasa.item_list.get(i).percent + " değer kazandı  "
-                            + arPiyasa.item_list.get(i).value + " lira.";
+                    temp = temp + "Yastıkaltıcılar yaşadı altın %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " değer kazandı  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " lira.";
                 }
                 else
-                    temp = temp + "Sarı lira yatırımcıları endişeli %" + arPiyasa.item_list.get(i).percent + " düşerek  "
-                            + arPiyasa.item_list.get(i).value + " liradan satıldı.";
+                    temp = temp + "Sarı lira yatırımcıları endişeli %" + arPiyasa.item_list.get(i).elements.get(ArPiyasa.PERCENT) + " düşerek  "
+                            + arPiyasa.item_list.get(i).elements.get(ArPiyasa.VALUE) + " liradan satıldı.";
             }
             temp = temp + spacer;
         }
@@ -400,10 +316,15 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
     @Override
     public void update(Observable observable, Object data) {
 
+
         if(observable instanceof ArManset)
-            new ArImageRequest(mansetLayout.image_view).execute(arManset.item_list.get(arManset.show_index).big_image_url);
-        if(observable instanceof ArSonDakika)
-            sonDakikaLayout.button.setText(arSonDakika.item_list.get(arSonDakika.show_index).article_title_detay);
+            new ArImageRequest(mansetLayout.image_view).execute(arManset.item_list.get(arManset.show_index).elements.get(ArManset.BIG_IMAGE_URL));
+        else if(observable instanceof ArSonDakika)
+            sonDakikaLayout.button.setText(arSonDakika.item_list.get(arSonDakika.show_index).elements.get(ArSonDakika.ARTICLE_TITLE_DETAIL));
+        else if(observable instanceof ArHavaDurumu)
+            setHavaDurumu();
+        else if(observable instanceof ArPiyasa)
+            setPiyasalar();
 
     }
 
@@ -439,7 +360,7 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
 
     @Override
     public void setBurc(int i) {
-        burcLayout.burc_detay.setText(arAstroloji.item_list.get(i).burc_spot);
+        burcLayout.burc_detay.setText(arAstroloji.item_list.get(i).elements.get(ArAstroloji.BURC_SPOT));
         if(i==0)
             burcLayout.picture.setImageResource(R.drawable.oglak);
         else if(i==1)
@@ -472,7 +393,7 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
     public void goMansetArticle() {
 
         Intent intent = new Intent(this,ArticleActivity.class);
-        intent.putExtra("article_url",arManset.item_list.get(arManset.show_index).article_id);
+        intent.putExtra("article_url",arManset.item_list.get(arManset.show_index).elements.get(ArManset.ARTICLE_ID));
 
         startActivity(intent);
 
@@ -486,10 +407,16 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
         startActivity(intent);
     }
 
+    public void goYazar() {
+
+        Intent intent = new Intent(this,YazarlarActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void goSonDakikaArticle() {
         Intent intent = new Intent(this,ArticleActivity.class);
-        intent.putExtra("article_url",arSonDakika.item_list.get(arSonDakika.show_index).article_id);
+        intent.putExtra("article_url",arSonDakika.item_list.get(arSonDakika.show_index).elements.get(ArSonDakika.ARTICLE_ID));
 
         startActivity(intent);
     }
@@ -501,32 +428,152 @@ public class Anasayfa extends AppCompatActivity implements TextWatcher, Observer
 
     public void setHavaDurumu()
     {
-        for(int i = 0 ; i<arHavaDurumu.item_list.size();i++)
+        for(int i = 0 ; i<arHavaDurumu.item_list.size()-1;i++)
         {
-            if(arHavaDurumu.item_list.get(i).location.equals("Ankara"))
+            if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.LOCATION).equals("Ankara"))
             {
                 havaDurumuLayout1.location.setText("Ankara");
-                havaDurumuLayout1.status_text.setText(arHavaDurumu.item_list.get(i).status);
-                havaDurumuLayout1.temperature.setText(arHavaDurumu.item_list.get(i).min_temp + " ve " + arHavaDurumu.item_list.get(i).max_temp + " derece arası");
+                havaDurumuLayout1.status_text.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS));
+                if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("kar"))
+                {
+                    havaDurumuLayout1.image.setImageResource(R.drawable.snow);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                {
+                    havaDurumuLayout1.image.setImageResource(R.drawable.rain);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("bulut"))
+                {
+                    havaDurumuLayout1.image.setImageResource(R.drawable.cloud);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("güneş") ||arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Güneş"))
+                {
+                    havaDurumuLayout1.image.setImageResource(R.drawable.sun);
+                }
+                else
+                {
+                    havaDurumuLayout1.image.setImageResource(R.drawable.cloud);
+                }
+                havaDurumuLayout1.temperature.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MIN_TEMPRATURE) + " ve " + arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MAX_TEMPRATURE) + " derece arası");
             }
-            else if(arHavaDurumu.item_list.get(i).location.equals("istanbul"))
+            else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.LOCATION).equals("istanbul"))
             {
                 havaDurumuLayout2.location.setText("İstanbul");
-                havaDurumuLayout2.status_text.setText(arHavaDurumu.item_list.get(i).status);
-                havaDurumuLayout2.temperature.setText(arHavaDurumu.item_list.get(i).min_temp + " ve " + arHavaDurumu.item_list.get(i).max_temp + " derece arası");
+                havaDurumuLayout2.status_text.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS));
+                if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("kar"))
+                {
+                    havaDurumuLayout2.image.setImageResource(R.drawable.snow);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                {
+                    havaDurumuLayout2.image.setImageResource(R.drawable.rain);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("bulut"))
+                {
+                    havaDurumuLayout2.image.setImageResource(R.drawable.cloud);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("güneş") ||arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Güneş"))
+                {
+                    havaDurumuLayout2.image.setImageResource(R.drawable.sun);
+                }
+                else
+                {
+                    havaDurumuLayout2.image.setImageResource(R.drawable.cloud);
+                }
+
+                havaDurumuLayout2.temperature.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MIN_TEMPRATURE) + " ve " + arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MAX_TEMPRATURE) + " derece arası");
             }
-            else if(arHavaDurumu.item_list.get(i).location.equals("izmir"))
+            else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.LOCATION).equals("izmir"))
             {
                 havaDurumuLayout3.location.setText("İzmir");
-                havaDurumuLayout3.status_text.setText(arHavaDurumu.item_list.get(i).status);
-                havaDurumuLayout3.temperature.setText(arHavaDurumu.item_list.get(i).min_temp + " ve " + arHavaDurumu.item_list.get(i).max_temp + " derece arası");
+                havaDurumuLayout3.status_text.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS));
+                if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("kar"))
+                {
+                    havaDurumuLayout3.image.setImageResource(R.drawable.snow);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                {
+                    havaDurumuLayout3.image.setImageResource(R.drawable.rain);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("bulut"))
+                {
+                    havaDurumuLayout3.image.setImageResource(R.drawable.cloud);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("güneş") ||arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Güneş"))
+                {
+                    havaDurumuLayout3.image.setImageResource(R.drawable.sun);
+                }
+                else
+                {
+                    havaDurumuLayout3.image.setImageResource(R.drawable.cloud);
+                }
+                havaDurumuLayout3.temperature.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MIN_TEMPRATURE) + " ve " + arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MAX_TEMPRATURE) + " derece arası");
             }
-            else if(arHavaDurumu.item_list.get(i).location.equals("Bursa"))
+            else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.LOCATION).equals("Bursa"))
             {
                 havaDurumuLayout4.location.setText("Bursa");
-                havaDurumuLayout4.status_text.setText(arHavaDurumu.item_list.get(i).status);
-                havaDurumuLayout4.temperature.setText(arHavaDurumu.item_list.get(i).min_temp + " ve " + arHavaDurumu.item_list.get(i).max_temp + " derece arası");
+                havaDurumuLayout4.status_text.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS));
+                if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("kar"))
+                {
+                    havaDurumuLayout4.image.setImageResource(R.drawable.snow);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                {
+                    havaDurumuLayout4.image.setImageResource(R.drawable.rain);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("bulut"))
+                {
+                    havaDurumuLayout4.image.setImageResource(R.drawable.cloud);
+                }
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("güneş") ||arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Güneş"))
+                {
+                    havaDurumuLayout4.image.setImageResource(R.drawable.sun);
+                }
+                else
+                {
+                    havaDurumuLayout4.image.setImageResource(R.drawable.cloud);
+                }
+
+                havaDurumuLayout4.temperature.setText(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MIN_TEMPRATURE) + " ve " + arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.MAX_TEMPRATURE) + " derece arası");
             }
+        }
+    }
+
+
+    @Override
+    public void finishTask(String str, int type, int id)
+    {
+
+        if(id==1)
+        {
+            arManset = new ArManset(str);
+            arManset.addObserver(this);
+            arManset.setIndex(0);
+        }
+        else if(id==2)
+        {
+            arSonDakika = new ArSonDakika(str);
+            arSonDakika.addObserver(this);
+        }
+        else if(id==3)
+        {
+            arAstroloji = new ArAstroloji(str);
+            BURC_CREATED = true;
+            burcLayout.spinner.setSelection(0);
+            setBurc(0);
+        }
+        else if(id==4)
+        {
+            arHavaDurumu = new ArHavaDurumu();
+            arHavaDurumu.addObserver(this);
+            arHavaDurumu.parse(str);
+        }
+        else if(id==5)
+        {
+            arPiyasa = new ArPiyasa();
+            arPiyasa.addObserver(this);
+            arPiyasa.parse(str);
+            PARSE_END = true;
         }
     }
 }
