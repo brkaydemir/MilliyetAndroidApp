@@ -69,25 +69,7 @@ public class ArAstroloji extends Observable {
         public AstrolojiItem() {
             elements = new HashMap<String, String>();
         }
-        //TODO clean text calısmıyor düzelt
-        public void cleanText()
-        {
-            String burc_spot = elements.get(ArAstroloji.BURC_SPOT);
 
-            burc_spot=burc_spot.replaceAll("<p>","");
-            burc_spot=burc_spot.replaceAll("&ccedil;","ç");
-            burc_spot=burc_spot.replaceAll("&Ccedil;","Ç");
-            burc_spot=burc_spot.replaceAll("&nbsp;","");
-            burc_spot=burc_spot.replaceAll("&ouml;","ö");
-            burc_spot=burc_spot.replaceAll("&Ouml;","Ö");
-            burc_spot=burc_spot.replaceAll("&uuml;","ü");
-            burc_spot=burc_spot.replaceAll("&Uuml;","Ü");
-            burc_spot=burc_spot.replaceAll("</p>","");
-            burc_spot=burc_spot.replaceAll("<br />","");
-
-            elements.remove(ArAstroloji.BURC_SPOT);
-            elements.put(ArAstroloji.BURC_SPOT,burc_spot);
-        }
     }
 
 

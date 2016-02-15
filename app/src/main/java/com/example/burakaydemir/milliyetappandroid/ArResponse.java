@@ -6,4 +6,5 @@ package com.example.burakaydemir.milliyetappandroid;
 public interface ArResponse {
 
     void finishTask(String str,int type,int id);
+    void finishImageTask();
 }

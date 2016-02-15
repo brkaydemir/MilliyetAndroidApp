@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MİLLİYET HABER</string>
+    <string name="app_name">Milliyet Haber</string>
     <string name="action_settings">Settings</string>
     <string name="left"><![CDATA[<]]></string>
     <string name="right"><![CDATA[>]]></string>
@@ -19,5 +19,18 @@
         <item>Boğa</item>
     </string-array>
     <string name="title_activity_yazarlar">YazarlarActivity</string>
+
+    <string-array name="kategoriler">
+        <item>ANASAYFA</item>
+        <item>TÜRKİYE</item>
+        <item>DÜNYA</item>
+        <item>EKONOMİ</item>
+        <item>SİYASET</item>
+        <item>YAŞAM</item>
+        <item>SPOR</item>
+        <item>EGE</item>
+        <item>CAFE</item>
+        <item>YAZARLAR</item>
+    </string-array>
 
 </resources>

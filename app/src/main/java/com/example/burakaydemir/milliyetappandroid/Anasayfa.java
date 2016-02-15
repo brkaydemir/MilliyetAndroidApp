@@ -2,17 +2,25 @@ package com.example.burakaydemir.milliyetappandroid;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import junit.framework.Test;
+
 import net.simonvt.menudrawer.MenuDrawer;
 import java.util.Observable;
 import java.util.Observer;
@@ -23,6 +31,11 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
 
     public static boolean BURC_CREATED;
     public static boolean PARSE_END;
+    public static boolean MANSET;
+    public static boolean SONDAKIKA;
+    public static boolean WEATHER;
+    public static boolean STOCK;
+    public static boolean APPLICATION_STARTED = false;
 
     public MenuDrawer mDrawer;
     public ArSonDakika arSonDakika;
@@ -39,15 +52,11 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
     public HavaDurumuLayout havaDurumuLayout3;
     public HavaDurumuLayout havaDurumuLayout4;
     public ScrollTextView scrolltext;
-    public Button turkiye;
-    public Button dunya;
-    public Button ekonomi;
-    public Button siyaset;
-    public Button yasam;
-    public Button spor;
-    public Button ege;
-    public Button cafe;
-    public Button yazarlar;
+    public ListView kategoriList;
+    public Button menuButton;
+    public Thread t;
+    public FragmentTransaction tempTrans;
+    public LoadingFragment tempFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,8 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
         StrictMode.setThreadPolicy(policy);
 
         super.onCreate(savedInstanceState);
+
+
 
         mDrawer = MenuDrawer.attach(this);
         mDrawer.setMenuView(R.layout.menu_drawer);
@@ -79,122 +90,117 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
 
         scrolltext = (ScrollTextView) findViewById(R.id.scrolltext);
 
-        turkiye = (Button) findViewById(R.id.button4);
-        dunya = (Button) findViewById(R.id.button5);
-        ekonomi = (Button) findViewById(R.id.button6);
-        siyaset = (Button) findViewById(R.id.button7);
-        yasam = (Button) findViewById(R.id.button8);
-        spor = (Button) findViewById(R.id.button9);
-        ege = (Button) findViewById(R.id.button10);
-        cafe = (Button) findViewById(R.id.button11);
-        yazarlar = (Button) findViewById(R.id.button12);
+        kategoriList = (ListView) findViewById(R.id.listView2);
+
+        menuButton = (Button) findViewById(R.id.button13);
 
 
+        Resources res= getResources();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.kategori_list_layout, res.getStringArray(R.array.kategoriler));
 
-        turkiye.setOnClickListener(new View.OnClickListener() {
+        kategoriList.setAdapter(adapter);
+
+        kategoriList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                goKategori(1);
-                mDrawer.closeMenu();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0)
+                {
+                    ;
+                }
+                else if(position>0 && position<9)
+                {
+                    goKategori(position);
+                }
+                else
+                    goYazar();
             }
         });
 
-        dunya.setOnClickListener(new View.OnClickListener() {
+        menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goKategori(2);
-                mDrawer.closeMenu();
-            }
-        });
-
-        ekonomi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(3);
-                mDrawer.closeMenu();
-            }
-        });
-
-        siyaset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(4);
-                mDrawer.closeMenu();
-            }
-        });
-
-        yasam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(5);
-                mDrawer.closeMenu();
-            }
-        });
-
-        spor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(6);
-                mDrawer.closeMenu();
-            }
-        });
-
-        ege.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(7);
-                mDrawer.closeMenu();
-            }
-        });
-
-        cafe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goKategori(8);
-                mDrawer.closeMenu();
-            }
-        });
-
-        yazarlar.setOnClickListener(new View.OnClickListener() {
-            //// TODO: 26.1.2016 yazarlar degisecek
-            @Override
-            public void onClick(View v) {
-                goYazar();
-                mDrawer.closeMenu();
+                mDrawer.openMenu();
             }
         });
 
         //timer threads
-        Thread t = new Thread() {
+
+        t = new Thread() {
 
             @Override
             public void run() {
                 try {
                     while (!isInterrupted()) {
-                        Thread.sleep(5000);
+                        if(APPLICATION_STARTED)
+                            Thread.sleep(5000);
+                        else
+                            Thread.sleep(2000);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 arSonDakika.inc_index();
+                                if(MANSET && SONDAKIKA &&BURC_CREATED && WEATHER && STOCK){
+                                    FrameLayout tempLayout = (FrameLayout)findViewById(R.id.container);
+                                    tempLayout.setVisibility(View.GONE);
+                                }
                             }
                         });
                     }
-                } catch (InterruptedException ignored) {
+                } catch (InterruptedException e) {
+                    return;
                 }
             }
         };
 
         t.start();
 
+        Bundle tempBundle = getIntent().getExtras();
 
+        if(savedInstanceState == null) {
+
+            if (!APPLICATION_STARTED) {
+                tempTrans = getSupportFragmentManager().beginTransaction();
+                tempFrag = new LoadingFragment();
+                tempTrans.add(R.id.container, tempFrag).show(tempFrag).commit();
+                APPLICATION_STARTED = true;
+            }
+            else {
+                FrameLayout tempFrame = (FrameLayout) findViewById(R.id.container);
+                tempFrame.setVisibility(View.GONE);
+            }
+        }
+        else
+        {
+            FrameLayout tempFrame = (FrameLayout) findViewById(R.id.container);
+            tempFrame.setVisibility(View.GONE);
+        }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+        t.interrupt();
+        arManset = null;
+        arPiyasa = null;
+        arHavaDurumu = null;
+        arSonDakika = null;
+        arAstroloji = null;
+        APPLICATION_STARTED = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        APPLICATION_STARTED = true;
+    }
 
     @Override
     protected void onStart()
     {
         super.onStart();
+
+
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -203,51 +209,44 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
         if (networkInfo != null && networkInfo.isConnected())
         {
             // download data
-            ArRequest request1 = new ArRequest(0,1);
-            request1.responseHandler = this;
-            request1.execute();
+            if(arManset == null)
+            {
+                ArRequest request1 = new ArRequest(0,1);
+                request1.responseHandler = this;
+                request1.execute();
+            }
 
-            ArRequest request2 = new ArRequest(0,2);
-            request2.responseHandler = this;
-            request2.execute();
+            if(arSonDakika == null)
+            {
+                ArRequest request2 = new ArRequest(0,2);
+                request2.responseHandler = this;
+                request2.execute();
+            }
 
-            ArRequest request3 = new ArRequest(0,3);
-            request3.responseHandler = this;
-            request3.execute();
+            if(arAstroloji == null)
+            {
+                ArRequest request3 = new ArRequest(0,3);
+                request3.responseHandler = this;
+                request3.execute();
 
-            ArRequest request4 = new ArRequest(0,4);
-            request4.responseHandler = this;
-            request4.execute();
+            }
 
-            ArRequest request5 = new ArRequest(0,5);
-            request5.responseHandler = this;
-            request5.execute();
+            if(arHavaDurumu == null)
+            {
+                ArRequest request4 = new ArRequest(0,4);
+                request4.responseHandler = this;
+                request4.execute();
+            }
+
+            if(arPiyasa==null)
+            {
+                ArRequest request5 = new ArRequest(0,5);
+                request5.responseHandler = this;
+                request5.execute();
+            }
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_anasayfa, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void setPiyasalar() {
 
@@ -317,8 +316,15 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
     public void update(Observable observable, Object data) {
 
 
-        if(observable instanceof ArManset)
-            new ArImageRequest(mansetLayout.image_view).execute(arManset.item_list.get(arManset.show_index).elements.get(ArManset.BIG_IMAGE_URL));
+        if(observable instanceof ArManset){
+
+
+            ArImageRequest request = new ArImageRequest(mansetLayout.image_view);
+            request.responseHandler = this;
+            request.execute(arManset.item_list.get(arManset.show_index).elements.get(ArManset.BIG_IMAGE_URL));
+            mansetLayout.image_view.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        }
         else if(observable instanceof ArSonDakika)
             sonDakikaLayout.button.setText(arSonDakika.item_list.get(arSonDakika.show_index).elements.get(ArSonDakika.ARTICLE_TITLE_DETAIL));
         else if(observable instanceof ArHavaDurumu)
@@ -399,6 +405,7 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
 
     }
 
+
     public void goKategori(int id)
     {
         Intent intent = new Intent(this,KategoriActivity.class);
@@ -416,8 +423,7 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
     @Override
     public void goSonDakikaArticle() {
         Intent intent = new Intent(this,ArticleActivity.class);
-        intent.putExtra("article_url",arSonDakika.item_list.get(arSonDakika.show_index).elements.get(ArSonDakika.ARTICLE_ID));
-
+        intent.putExtra("article_url", arSonDakika.item_list.get(arSonDakika.show_index).elements.get(ArSonDakika.ARTICLE_ID));
         startActivity(intent);
     }
 
@@ -438,7 +444,8 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
                 {
                     havaDurumuLayout1.image.setImageResource(R.drawable.snow);
                 }
-                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("sağanak")
+                        || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Sağanak"))
                 {
                     havaDurumuLayout1.image.setImageResource(R.drawable.rain);
                 }
@@ -464,7 +471,8 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
                 {
                     havaDurumuLayout2.image.setImageResource(R.drawable.snow);
                 }
-                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("sağanak")
+                        || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Sağanak"))
                 {
                     havaDurumuLayout2.image.setImageResource(R.drawable.rain);
                 }
@@ -491,7 +499,8 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
                 {
                     havaDurumuLayout3.image.setImageResource(R.drawable.snow);
                 }
-                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("sağanak")
+                        || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Sağanak"))
                 {
                     havaDurumuLayout3.image.setImageResource(R.drawable.rain);
                 }
@@ -517,7 +526,8 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
                 {
                     havaDurumuLayout4.image.setImageResource(R.drawable.snow);
                 }
-                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur"))
+                else if(arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("sağanak")
+                        || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağış") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Yağmur") || arHavaDurumu.item_list.get(i).elements.get(ArHavaDurumu.STATUS).contains("Sağanak"))
                 {
                     havaDurumuLayout4.image.setImageResource(R.drawable.rain);
                 }
@@ -549,32 +559,44 @@ public class Anasayfa extends AppCompatActivity implements Observer, IAnasayfa, 
             arManset = new ArManset(str);
             arManset.addObserver(this);
             arManset.setIndex(0);
+            MANSET = true;
         }
         else if(id==2)
         {
             arSonDakika = new ArSonDakika(str);
             arSonDakika.addObserver(this);
+            SONDAKIKA = true;
         }
         else if(id==3)
         {
             arAstroloji = new ArAstroloji(str);
-            BURC_CREATED = true;
+            burcLayout.picture.setScaleType(ImageView.ScaleType.FIT_XY);
             burcLayout.spinner.setSelection(0);
             setBurc(0);
+            BURC_CREATED = true;
         }
         else if(id==4)
         {
             arHavaDurumu = new ArHavaDurumu();
             arHavaDurumu.addObserver(this);
             arHavaDurumu.parse(str);
+            WEATHER = true;
         }
         else if(id==5)
         {
             arPiyasa = new ArPiyasa();
             arPiyasa.addObserver(this);
             arPiyasa.parse(str);
+            STOCK = true;
             PARSE_END = true;
         }
+    }
+
+    @Override
+    public void finishImageTask() {
+        mansetLayout.image_view.setVisibility(View.VISIBLE);
+        mansetLayout.left_button.setVisibility(View.VISIBLE);
+        mansetLayout.right_button.setVisibility(View.VISIBLE);
     }
 }
 

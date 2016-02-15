@@ -7,7 +7,9 @@
     android:layout_height="fill_parent"
     tools:context="com.example.burakaydemir.milliyetappandroid.Anasayfa">
 
-    <android.support.design.widget.AppBarLayout
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/appbarlayout"
@@ -16,15 +18,46 @@
         android:background="#ffff0f0f"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="40dp"
-            android:text="@string/app_name"
-            style="@style/Base.TextAppearance.AppCompat.Headline" />
 
-    </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="top|start"
+                android:paddingLeft="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                app:layout_collapseMode="parallax"
+                android:orientation="horizontal">
+                <Button
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_gravity="left"
+                    android:id="@+id/button13"
+                    android:background="@drawable/menu" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/app_name"
+                android:gravity="center"
+                android:textSize="40dp"
+                android:text="@string/app_name"
+                style="@style/Base.TextAppearance.AppCompat.Headline" />
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+
+
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/textview"
@@ -58,7 +91,7 @@
                 android:id="@+id/customLayout"
                 android:layout_width="fill_parent"
                 android:paddingTop="16dp"
-                android:layout_height="250dp"
+                android:layout_height="240dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"/>
 
@@ -165,5 +198,11 @@
         </RelativeLayout>
     </ScrollView>
 
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:id="@+id/container"></FrameLayout>
 
 </RelativeLayout>

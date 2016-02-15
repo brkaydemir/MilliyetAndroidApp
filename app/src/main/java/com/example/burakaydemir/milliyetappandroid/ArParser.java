@@ -85,6 +85,7 @@ public class ArParser {
                     parser.next();
                     //Log.d("parser", "reader: " + parser.getText());
                     value = parser.getText().trim();
+                    value = cleanText(value);
                     result.put(key,value);
                 }
                 if(event == XmlPullParser.END_DOCUMENT)
@@ -96,5 +97,23 @@ public class ArParser {
         }
 
         return result;
+    }
+
+    public String cleanText(String str)
+    {
+        String burc_spot=str;
+
+        burc_spot=burc_spot.replaceAll("<p>","");
+        burc_spot=burc_spot.replaceAll("&ccedil;","ç");
+        burc_spot=burc_spot.replaceAll("&Ccedil;","Ç");
+        burc_spot=burc_spot.replaceAll("&nbsp;","");
+        burc_spot=burc_spot.replaceAll("&ouml;","ö");
+        burc_spot=burc_spot.replaceAll("&Ouml;","Ö");
+        burc_spot=burc_spot.replaceAll("&uuml;","ü");
+        burc_spot=burc_spot.replaceAll("&Uuml;","Ü");
+        burc_spot=burc_spot.replaceAll("</p>","");
+        burc_spot=burc_spot.replaceAll("<br />","");
+
+        return burc_spot;
     }
 }

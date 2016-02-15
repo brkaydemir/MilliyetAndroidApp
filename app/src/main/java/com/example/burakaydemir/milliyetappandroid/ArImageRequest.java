@@ -13,6 +13,7 @@ import java.net.URL;
  */
 public class ArImageRequest extends AsyncTask<String, Void, Bitmap> {
     public ImageView bmImage;
+    public ArResponse responseHandler;
 
     public ArImageRequest(ImageView bmImage) {
         //Log.d(TAG, "ArImageRequest: ");
@@ -36,6 +37,8 @@ public class ArImageRequest extends AsyncTask<String, Void, Bitmap> {
 
         if(result!=null)
             bmImage.setImageBitmap(result);
+        if(responseHandler!=null)
+            responseHandler.finishImageTask();
 
     }
 }
